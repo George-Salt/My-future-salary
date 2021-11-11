@@ -1,58 +1,6 @@
 import requests
 
 
-def get_count_vacancies():
-    url = "https://api.hh.ru/vacancies"
-    count_vacancy = 0
-    programming_languages = {
-        "Python": 0,
-        "Java": 0,
-        "Javascript": 0,
-        "Ruby": 0,
-        "PHP": 0,
-        "C++": 0,
-        "C#": 0,
-        "C": 0,
-        "Go": 0,
-        "Shell": 0
-    }
-
-    for language in programming_languages:
-        params = {
-            "specialization": "1.221",
-            "area": "1",
-            "period": 30,
-            "text": f"{language}"
-        }
-
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-
-        count_vacancy = response.json()["found"]
-        programming_languages[language] = count_vacancy
-        count_vacancy = 0
-    return programming_languages
-
-
-def get_salary_of_python():
-    url = "https://api.hh.ru/vacancies"
-    salary = []
-    params = {
-        "specialization": "1.221",
-        "area": "1",
-        "period": 30,
-        "text": "Python"
-    }
-
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-
-    for vacancy_num in range(20):
-        salary_in_vacancy = response.json()["items"][vacancy_num]["salary"]
-        salary.append(salary_in_vacancy)
-    return salary
-
-
 def get_request():
     url = "https://api.hh.ru/vacancies"
     params = {
@@ -80,5 +28,51 @@ def predict_rub_salary(vacancy):
     return expected_salary
 
 
-for vacancy in get_request()["items"]:
-    print(predict_rub_salary(vacancy))
+def get_description_of_vacancies():
+    count_used = 0
+    predict_salaries = []
+    url = "https://api.hh.ru/vacancies"
+    programming_languages = {
+        "Python": 0,
+        "Java": 0,
+        "Javascript": 0,
+        "Ruby": 0,
+        "PHP": 0,
+        "C++": 0,
+        "C#": 0,
+        "C": 0,
+        "Go": 0,
+        "Shell": 0
+    }
+
+    for language in programming_languages:
+        params = {
+            "specialization": "1.221",
+            "area": "1",
+            "period": 30,
+            "text": f"{language}",
+            "currency": "RUR",
+            "only_with_salary": True
+        }
+
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+
+        for vacancy in response.json()["items"]:
+            predict_salaries.append(predict_rub_salary(vacancy))
+            count_used += 1
+
+        predict_salary = sum(predict_salaries) / len(predict_salaries)
+
+        count_vacancy = response.json()["found"]
+        programming_languages[language] = {
+            "vacancies_found": count_vacancy,
+            "vacancies_processed": count_used,
+            "average_salary": int(predict_salary)
+        }
+        count_vacancy = 0
+        count_used = 0
+    return programming_languages
+
+
+print(get_description_of_vacancies())
