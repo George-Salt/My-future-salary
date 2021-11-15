@@ -46,25 +46,27 @@ def get_description_of_vacancies():
     }
 
     for language in programming_languages:
-        params = {
-            "specialization": "1.221",
-            "area": "1",
-            "period": 30,
-            "text": f"{language}",
-            "currency": "RUR",
-            "only_with_salary": True
-        }
+        for page in range(get_request()["pages"]):
+            params = {
+                "specialization": "1.221",
+                "area": "1",
+                "period": 30,
+                "text": f"{language}",
+                "currency": "RUR",
+                "only_with_salary": True,
+                "page": f"{page}"
+            }
 
-        response = requests.get(url, params=params)
-        response.raise_for_status()
+            response = requests.get(url, params=params)
+            response.raise_for_status()
 
-        for vacancy in response.json()["items"]:
-            predict_salaries.append(predict_rub_salary(vacancy))
-            count_used += 1
-
-        predict_salary = sum(predict_salaries) / len(predict_salaries)
+            for vacancy in response.json()["items"]:
+                predict_salaries.append(predict_rub_salary(vacancy))
+                count_used += 1
 
         count_vacancy = response.json()["found"]
+        predict_salary = sum(predict_salaries) / len(predict_salaries)
+
         programming_languages[language] = {
             "vacancies_found": count_vacancy,
             "vacancies_processed": count_used,
