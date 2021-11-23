@@ -84,6 +84,26 @@ def get_description_of_languages_hh():
     return programming_languages
 
 
+def create_table_hh():
+    description = get_description_of_languages_hh()
+    title = "HeadHunter Moscow"
+    table_data = [
+        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"],
+        ["Python", description["Python"]["vacancies_found"], description["Python"]["vacancies_processed"], description["Python"]["average_salary"]],
+        ["Java", description["Java"]["vacancies_found"], description["Java"]["vacancies_processed"], description["Java"]["average_salary"]],
+        ["Javascript", description["Javascript"]["vacancies_found"], description["Javascript"]["vacancies_processed"], description["Javascript"]["average_salary"]],
+        ["Ruby", description["Ruby"]["vacancies_found"], description["Ruby"]["vacancies_processed"], description["Ruby"]["average_salary"]],
+        ["PHP", description["PHP"]["vacancies_found"], description["PHP"]["vacancies_processed"], description["PHP"]["average_salary"]],
+        ["C++", description["C++"]["vacancies_found"], description["C++"]["vacancies_processed"], description["C++"]["average_salary"]],
+        ["C#", description["C#"]["vacancies_found"], description["C#"]["vacancies_processed"], description["C#"]["average_salary"]],
+        ["C", description["C"]["vacancies_found"], description["C"]["vacancies_processed"], description["C"]["average_salary"]],
+        ["Go", description["Go"]["vacancies_found"], description["Go"]["vacancies_processed"], description["Go"]["average_salary"]],
+        ["Shell", description["Shell"]["vacancies_found"], description["Shell"]["vacancies_processed"], description["Shell"]["average_salary"]],
+    ]
+    table = AsciiTable(table_data, title)
+    return table.table
+
+
 def get_request_sj(key, language="Python", page=0):
     url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
@@ -171,4 +191,4 @@ def create_table_sj():
     return table.table
 
 
-print(create_table_sj())
+print(create_table_sj(),"\n", create_table_hh())
