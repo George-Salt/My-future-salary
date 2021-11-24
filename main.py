@@ -191,4 +191,4 @@ def create_table_sj():
     return table.table
 
 
-print(create_table_sj(),"\n", create_table_hh())
+print(create_table_sj(), "\n", create_table_hh())
