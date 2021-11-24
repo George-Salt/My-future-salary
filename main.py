@@ -8,15 +8,16 @@ load_dotenv()
 superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
 
 
-def get_request_hh():
+def get_request_hh(language="Python", page=0):
     url = "https://api.hh.ru/vacancies"
     params = {
         "specialization": "1.221",
         "area": "1",
         "period": 30,
-        "text": "Python",
+        "text": language,
         "currency": "RUR",
-        "only_with_salary": True
+        "only_with_salary": True,
+        "page": page
     }
 
     response = requests.get(url, params=params)
@@ -38,7 +39,6 @@ def predict_rub_salary_hh(vacancy):
 def get_description_of_languages_hh():
     count_used = 0
     predict_salaries = []
-    url = "https://api.hh.ru/vacancies"
     programming_languages = {
         "Python": 0,
         "Java": 0,
@@ -54,24 +54,13 @@ def get_description_of_languages_hh():
 
     for language in programming_languages:
         for page in range(get_request_hh()["pages"]):
-            params = {
-                "specialization": "1.221",
-                "area": "1",
-                "period": 30,
-                "text": f"{language}",
-                "currency": "RUR",
-                "only_with_salary": True,
-                "page": f"{page}"
-            }
+            response = get_request_hh(language, page=page)
 
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-
-            for vacancy in response.json()["items"]:
+            for vacancy in response["items"]:
                 predict_salaries.append(predict_rub_salary_hh(vacancy))
                 count_used += 1
 
-        count_vacancy = response.json()["found"]
+        count_vacancy = response["found"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
 
         programming_languages[language] = {
@@ -115,8 +104,8 @@ def get_request_sj(key, language="Python", page=0):
         "period": 30,
         "catalogues": 48,
         "currency": "rub",
-        "keyword": f"{language}",
-        "page": f"{page}"
+        "keyword": language,
+        "page": page
     }
 
     response = requests.get(url, params=params, headers=headers)
