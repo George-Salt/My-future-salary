@@ -191,4 +191,5 @@ def create_table_sj():
     return table.table
 
 
-print(create_table_sj(), "\n", create_table_hh())
+if __name__ == "__main__":
+    print(f"{create_table_sj()}\n{create_table_hh()}")
