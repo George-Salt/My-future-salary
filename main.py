@@ -2,10 +2,6 @@ from terminaltables import AsciiTable
 import requests
 import os
 from dotenv import load_dotenv
-load_dotenv()
-
-
-superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
 
 
 def get_request_hh(language="Python", page=0):
@@ -181,4 +177,6 @@ def create_table_sj():
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
     print(f"{create_table_sj()}\n{create_table_hh()}")
