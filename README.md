@@ -4,7 +4,7 @@
 
 ### Как установить
 
-В папке проекта создайте файл `.env` и поместите в него ключ токен от сервиса SuperJob в переменную `SUPERJOB_SECRET_KEY`:
+В папке проекта создайте файл `.env` и поместите в него [ключ от сервиса SuperJob](https://api.superjob.ru/) в переменную `SUPERJOB_SECRET_KEY`:
 ```
 SUPERJOB_SECRET_KEY="secretkey"
 ```
