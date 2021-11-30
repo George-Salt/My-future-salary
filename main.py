@@ -70,21 +70,14 @@ def get_description_of_languages_hh():
 
 
 def create_table_hh():
+    table_data = [
+        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
+    ]
     description = get_description_of_languages_hh()
     title = "HeadHunter Moscow"
-    table_data = [
-        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"],
-        ["Python", description["Python"]["vacancies_found"], description["Python"]["vacancies_processed"], description["Python"]["average_salary"]],
-        ["Java", description["Java"]["vacancies_found"], description["Java"]["vacancies_processed"], description["Java"]["average_salary"]],
-        ["Javascript", description["Javascript"]["vacancies_found"], description["Javascript"]["vacancies_processed"], description["Javascript"]["average_salary"]],
-        ["Ruby", description["Ruby"]["vacancies_found"], description["Ruby"]["vacancies_processed"], description["Ruby"]["average_salary"]],
-        ["PHP", description["PHP"]["vacancies_found"], description["PHP"]["vacancies_processed"], description["PHP"]["average_salary"]],
-        ["C++", description["C++"]["vacancies_found"], description["C++"]["vacancies_processed"], description["C++"]["average_salary"]],
-        ["C#", description["C#"]["vacancies_found"], description["C#"]["vacancies_processed"], description["C#"]["average_salary"]],
-        ["C", description["C"]["vacancies_found"], description["C"]["vacancies_processed"], description["C"]["average_salary"]],
-        ["Go", description["Go"]["vacancies_found"], description["Go"]["vacancies_processed"], description["Go"]["average_salary"]],
-        ["Shell", description["Shell"]["vacancies_found"], description["Shell"]["vacancies_processed"], description["Shell"]["average_salary"]],
-    ]
+
+    for language, vacancies in description.items():
+        table_data.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
     table = AsciiTable(table_data, title)
     return table.table
 
@@ -156,22 +149,15 @@ def get_description_of_languages_sj(key):
     return programming_languages
 
 
-def create_table_sj():
-    description = get_description_of_languages_sj(superjob_key)
-    title = "SuperJob Moscow"
+def create_table_sj(key):
     table_data = [
-        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"],
-        ["Python", description["Python"]["vacancies_found"], description["Python"]["vacancies_processed"], description["Python"]["average_salary"]],
-        ["Java", description["Java"]["vacancies_found"], description["Java"]["vacancies_processed"], description["Java"]["average_salary"]],
-        ["Javascript", description["Javascript"]["vacancies_found"], description["Javascript"]["vacancies_processed"], description["Javascript"]["average_salary"]],
-        ["Ruby", description["Ruby"]["vacancies_found"], description["Ruby"]["vacancies_processed"], description["Ruby"]["average_salary"]],
-        ["PHP", description["PHP"]["vacancies_found"], description["PHP"]["vacancies_processed"], description["PHP"]["average_salary"]],
-        ["C++", description["C++"]["vacancies_found"], description["C++"]["vacancies_processed"], description["C++"]["average_salary"]],
-        ["C#", description["C#"]["vacancies_found"], description["C#"]["vacancies_processed"], description["C#"]["average_salary"]],
-        ["C", description["C"]["vacancies_found"], description["C"]["vacancies_processed"], description["C"]["average_salary"]],
-        ["Go", description["Go"]["vacancies_found"], description["Go"]["vacancies_processed"], description["Go"]["average_salary"]],
-        ["Shell", description["Shell"]["vacancies_found"], description["Shell"]["vacancies_processed"], description["Shell"]["average_salary"]],
+        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
     ]
+    description = get_description_of_languages_sj(key)
+    title = "SuperJob Moscow"
+    
+    for language, vacancies in description.items():
+        table_data.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
     table = AsciiTable(table_data, title)
     return table.table
 
@@ -179,4 +165,4 @@ def create_table_sj():
 if __name__ == "__main__":
     load_dotenv()
     superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
-    print(f"{create_table_sj()}\n{create_table_hh()}")
+    print(f"{create_table_sj(superjob_key)}\n{create_table_hh()}")
