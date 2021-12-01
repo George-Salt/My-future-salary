@@ -11,7 +11,7 @@ PROGRAMMING_CATALOGUE = 48
 
 
 def get_request_hh(language="Python", page=0):
-    url = "https://api.hh.ru/vacancies"
+    url = "https://api.hh.ru/vacancies/"
     params = {
         "specialization": PROGRAMMER_SPECIALIZATION,
         "area": MOSCOW_ID,
@@ -155,20 +155,20 @@ def get_description_of_languages_sj(key):
     return programming_languages
 
 
-def create_table_sj(key):
-    table_data = [
+def create_tables(key):
+    table_data_sj = [
         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
     ]
     description = get_description_of_languages_sj(key)
-    title = "SuperJob Moscow"
+    title_sj = "SuperJob Moscow"
 
     for language, vacancies in description.items():
-        table_data.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
-    table = AsciiTable(table_data, title)
-    return table.table
+        table_data_sj.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
+    table_sj = AsciiTable(table_data_sj, title_sj)
+    return table_sj.table
 
 
 if __name__ == "__main__":
     load_dotenv()
     superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
-    print(f"{create_table_sj(superjob_key)}\n{create_table_hh()}")
+    print(f"{create_tables(superjob_key)}\n{create_table_hh()}")
