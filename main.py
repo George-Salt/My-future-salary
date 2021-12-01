@@ -4,12 +4,18 @@ import os
 from dotenv import load_dotenv
 
 
+PROGRAMMER_SPECIALIZATION = "1.221"
+MOSCOW_ID = "1"
+PERIOD_DAYS = 30
+PROGRAMMING_CATALOGUE = 48
+
+
 def get_request_hh(language="Python", page=0):
     url = "https://api.hh.ru/vacancies"
     params = {
-        "specialization": "1.221",
-        "area": "1",
-        "period": 30,
+        "specialization": PROGRAMMER_SPECIALIZATION,
+        "area": MOSCOW_ID,
+        "period": PERIOD_DAYS,
         "text": language,
         "currency": "RUR",
         "only_with_salary": True,
@@ -90,8 +96,8 @@ def get_request_sj(key, language="Python", page=0):
 
     params = {
         "town": "Moscow",
-        "period": 30,
-        "catalogues": 48,
+        "period": PERIOD_DAYS,
+        "catalogues": PROGRAMMING_CATALOGUE,
         "currency": "rub",
         "keyword": language,
         "page": page
@@ -155,7 +161,7 @@ def create_table_sj(key):
     ]
     description = get_description_of_languages_sj(key)
     title = "SuperJob Moscow"
-    
+
     for language, vacancies in description.items():
         table_data.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
     table = AsciiTable(table_data, title)
