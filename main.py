@@ -10,6 +10,16 @@ PERIOD_DAYS = 30
 PROGRAMMING_CATALOGUE = 48
 
 
+def predict_rub_salary(salary_from=None, salary_to=None):
+    if salary_from and salary_to:
+        expected_salary = int(salary_to + salary_from) / 2
+    elif not salary_from:
+        expected_salary = salary_to * 1.2
+    elif not salary_to:
+        expected_salary = salary_from * 0.8
+    return expected_salary
+
+
 def get_request_hh(language="Python", page=0):
     url = "https://api.hh.ru/vacancies/"
     params = {
@@ -17,25 +27,12 @@ def get_request_hh(language="Python", page=0):
         "area": MOSCOW_ID,
         "period": PERIOD_DAYS,
         "text": language,
-        "currency": "RUR",
-        "only_with_salary": True,
         "page": page
     }
 
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response.json()
-
-
-def predict_rub_salary_hh(vacancy):
-    salary_of_vacancy = vacancy["salary"]
-    if salary_of_vacancy["from"] and salary_of_vacancy["to"]:
-        expected_salary = int(salary_of_vacancy["to"] + salary_of_vacancy["from"]) / 2
-    elif not salary_of_vacancy["from"]:
-        expected_salary = salary_of_vacancy["to"] * 1.2
-    elif not salary_of_vacancy["to"]:
-        expected_salary = salary_of_vacancy["from"] * 0.8
-    return expected_salary
 
 
 def get_description_of_languages_hh():
@@ -59,8 +56,10 @@ def get_description_of_languages_hh():
             response = get_request_hh(language, page=page)
 
             for vacancy in response["items"]:
-                predict_salaries.append(predict_rub_salary_hh(vacancy))
-                count_used += 1
+                if vacancy["salary"]:
+                    if vacancy["salary"]["currency"] == "RUR":
+                        predict_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
+                        count_used += 1
 
         count_vacancy = response["found"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
@@ -75,19 +74,6 @@ def get_description_of_languages_hh():
     return programming_languages
 
 
-def create_table_hh():
-    table_data = [
-        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
-    ]
-    description = get_description_of_languages_hh()
-    title = "HeadHunter Moscow"
-
-    for language, vacancies in description.items():
-        table_data.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
-    table = AsciiTable(table_data, title)
-    return table.table
-
-
 def get_request_sj(key, language="Python", page=0):
     url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
@@ -98,7 +84,6 @@ def get_request_sj(key, language="Python", page=0):
         "town": "Moscow",
         "period": PERIOD_DAYS,
         "catalogues": PROGRAMMING_CATALOGUE,
-        "currency": "rub",
         "keyword": language,
         "page": page
     }
@@ -106,16 +91,6 @@ def get_request_sj(key, language="Python", page=0):
     response = requests.get(url, params=params, headers=headers)
     response.raise_for_status()
     return response.json()
-
-
-def predict_rub_salary_sj(vacancy):
-    if vacancy["payment_from"] and vacancy["payment_to"]:
-        expected_salary = int(vacancy["payment_to"] + vacancy["payment_from"]) / 2
-    elif not vacancy["payment_from"]:
-        expected_salary = vacancy["payment_to"] * 1.2
-    elif not vacancy["payment_to"]:
-        expected_salary = vacancy["payment_from"] * 0.8
-    return expected_salary
 
 
 def get_description_of_languages_sj(key):
@@ -139,8 +114,10 @@ def get_description_of_languages_sj(key):
             response = get_request_sj(key, language, page=page)
 
             for vacancy in response["objects"]:
-                predict_salaries.append(predict_rub_salary_sj(vacancy))
-                count_used += 1
+                if vacancy["payment_from"] or vacancy["payment_to"]:
+                    if vacancy["currency"] == "rub":
+                        predict_salaries.append(predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]))
+                        count_used += 1
 
         count_vacancy = response["total"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
@@ -159,16 +136,24 @@ def create_tables(key):
     table_data_sj = [
         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
     ]
-    description = get_description_of_languages_sj(key)
+    description_sj = get_description_of_languages_sj(key)
     title_sj = "SuperJob Moscow"
-
-    for language, vacancies in description.items():
+    for language, vacancies in description_sj.items():
         table_data_sj.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
     table_sj = AsciiTable(table_data_sj, title_sj)
-    return table_sj.table
+
+    table_data_hh = [
+        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
+    ]
+    description_hh = get_description_of_languages_hh()
+    title_hh = "HeadHunter Moscow"
+    for language, vacancies in description_hh.items():
+        table_data_hh.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
+    table_hh = AsciiTable(table_data_hh, title_hh)
+    return f"{table_sj.table}\n{table_hh.table}"
 
 
 if __name__ == "__main__":
     load_dotenv()
     superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
-    print(f"{create_tables(superjob_key)}\n{create_table_hh()}")
+    print(create_tables(superjob_key))
