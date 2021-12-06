@@ -35,23 +35,11 @@ def get_request_hh(language="Python", page=0):
     return response.json()
 
 
-def get_description_of_languages_hh():
+def get_description_of_languages_hh(languages):
     count_used = 0
     predict_salaries = []
-    programming_languages = {
-        "Python": 0,
-        "Java": 0,
-        "Javascript": 0,
-        "Ruby": 0,
-        "PHP": 0,
-        "C++": 0,
-        "C#": 0,
-        "C": 0,
-        "Go": 0,
-        "Shell": 0
-    }
 
-    for language in programming_languages:
+    for language in languages:
         for page in range(get_request_hh()["pages"]):
             response = get_request_hh(language, page=page)
 
@@ -64,14 +52,14 @@ def get_description_of_languages_hh():
         count_vacancy = response["found"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
 
-        programming_languages[language] = {
+        languages[language] = {
             "vacancies_found": count_vacancy,
             "vacancies_processed": count_used,
             "average_salary": int(predict_salary)
         }
         count_vacancy = 0
         count_used = 0
-    return programming_languages
+    return languages
 
 
 def get_request_sj(key, language="Python", page=0):
@@ -93,23 +81,11 @@ def get_request_sj(key, language="Python", page=0):
     return response.json()
 
 
-def get_description_of_languages_sj(key):
+def get_description_of_languages_sj(key, languages):
     count_used = 0
     predict_salaries = []
-    programming_languages = {
-        "Python": 0,
-        "Java": 0,
-        "Javascript": 0,
-        "Ruby": 0,
-        "PHP": 0,
-        "C++": 0,
-        "C#": 0,
-        "C": 0,
-        "Go": 0,
-        "Shell": 0
-    }
 
-    for language in programming_languages:
+    for language in languages:
         for page in range(int(get_request_sj(key, language)["total"] / 20 + 1)):
             response = get_request_sj(key, language, page=page)
 
@@ -122,21 +98,21 @@ def get_description_of_languages_sj(key):
         count_vacancy = response["total"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
 
-        programming_languages[language] = {
+        languages[language] = {
             "vacancies_found": count_vacancy,
             "vacancies_processed": count_used,
             "average_salary": int(predict_salary)
         }
         count_vacancy = 0
         count_used = 0
-    return programming_languages
+    return languages
 
 
-def create_tables(key):
+def create_tables(key, languages):
     table_data_sj = [
         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
     ]
-    description_sj = get_description_of_languages_sj(key)
+    description_sj = get_description_of_languages_sj(key, languages)
     title_sj = "SuperJob Moscow"
     for language, vacancies in description_sj.items():
         table_data_sj.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
@@ -145,7 +121,7 @@ def create_tables(key):
     table_data_hh = [
         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
     ]
-    description_hh = get_description_of_languages_hh()
+    description_hh = get_description_of_languages_hh(languages)
     title_hh = "HeadHunter Moscow"
     for language, vacancies in description_hh.items():
         table_data_hh.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
@@ -154,6 +130,18 @@ def create_tables(key):
 
 
 if __name__ == "__main__":
+    programming_languages = {
+        "Python": 0,
+        "Java": 0,
+        "Javascript": 0,
+        "Ruby": 0,
+        "PHP": 0,
+        "C++": 0,
+        "C#": 0,
+        "C": 0,
+        "Go": 0,
+        "Shell": 0
+    }
     load_dotenv()
     superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
-    print(create_tables(superjob_key))
+    print(create_tables(superjob_key, programming_languages))
