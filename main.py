@@ -1,6 +1,7 @@
 from terminaltables import AsciiTable
 import requests
 import os
+from itertools import count
 from dotenv import load_dotenv
 
 
@@ -40,7 +41,7 @@ def get_description_of_languages_hh(languages):
     predict_salaries = []
 
     for language in languages:
-        for page in range(get_request_hh()["pages"]):
+        for page in count(0, 1):
             response = get_request_hh(language, page=page)
 
             for vacancy in response["items"]:
@@ -48,6 +49,9 @@ def get_description_of_languages_hh(languages):
                     if vacancy["salary"]["currency"] == "RUR":
                         predict_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
                         count_used += 1
+
+            if page >= response["pages"] - 1:
+                break
 
         count_vacancy = response["found"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
@@ -86,7 +90,7 @@ def get_description_of_languages_sj(key, languages):
     predict_salaries = []
 
     for language in languages:
-        for page in range(int(get_request_sj(key, language)["total"] / 20 + 1)):
+        for page in count(0, 1):
             response = get_request_sj(key, language, page=page)
 
             for vacancy in response["objects"]:
@@ -94,6 +98,9 @@ def get_description_of_languages_sj(key, languages):
                     if vacancy["currency"] == "rub":
                         predict_salaries.append(predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]))
                         count_used += 1
+
+            if not response["more"]:
+                break
 
         count_vacancy = response["total"]
         predict_salary = sum(predict_salaries) / len(predict_salaries)
