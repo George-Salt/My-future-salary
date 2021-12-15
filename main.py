@@ -40,6 +40,7 @@ def get_description_of_languages_hh(languages):
     for language in languages:
         predict_salaries = []
         count_used = 0
+        count_vacancy = 0
         for page in count(0, 1):
             response = get_request_hh(language, page=page)
 
@@ -60,7 +61,6 @@ def get_description_of_languages_hh(languages):
             "vacancies_processed": count_used,
             "average_salary": int(predict_salary)
         }
-        count_vacancy = 0
     return languages
 
 
@@ -84,10 +84,10 @@ def get_request_sj(key, language="Python", page=0):
 
 
 def get_description_of_languages_sj(key, languages):
-    count_used = 0
-    predict_salaries = []
-
     for language in languages:
+        count_used = 0
+        predict_salaries = []
+        count_vacancy = 0
         for page in count(0, 1):
             response = get_request_sj(key, language, page=page)
 
@@ -108,8 +108,6 @@ def get_description_of_languages_sj(key, languages):
             "vacancies_processed": count_used,
             "average_salary": int(predict_salary)
         }
-        count_vacancy = 0
-        count_used = 0
     return languages
 
 
