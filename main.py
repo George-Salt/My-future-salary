@@ -37,10 +37,9 @@ def get_request_hh(language="Python", page=0):
 
 
 def get_description_of_languages_hh(languages):
-    count_used = 0
-    predict_salaries = []
-
     for language in languages:
+        predict_salaries = []
+        count_used = 0
         for page in count(0, 1):
             response = get_request_hh(language, page=page)
 
@@ -62,7 +61,6 @@ def get_description_of_languages_hh(languages):
             "average_salary": int(predict_salary)
         }
         count_vacancy = 0
-        count_used = 0
     return languages
 
 
