@@ -54,12 +54,12 @@ def get_description_of_languages_hh(languages):
                 break
 
         count_vacancy = response["found"]
-        predict_salary = sum(average_salaries) / len(average_salaries)
+        average_salary = sum(average_salaries) / len(average_salaries)
 
         languages[language] = {
             "vacancies_found": count_vacancy,
             "vacancies_processed": count_used,
-            "average_salary": int(predict_salary)
+            "average_salary": int(average_salary)
         }
     return languages
 
@@ -101,12 +101,12 @@ def get_description_of_languages_sj(key, languages):
                 break
 
         count_vacancy = response["total"]
-        predict_salary = sum(average_salaries) / len(average_salaries)
+        average_salary = sum(average_salaries) / len(average_salaries)
 
         languages[language] = {
             "vacancies_found": count_vacancy,
             "vacancies_processed": count_used,
-            "average_salary": int(predict_salary)
+            "average_salary": int(average_salary)
         }
     return languages
 
