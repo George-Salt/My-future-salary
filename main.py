@@ -38,7 +38,7 @@ def get_request_hh(language="Python", page=0):
 
 def get_description_of_languages_hh(languages):
     for language in languages:
-        predict_salaries = []
+        average_salaries = []
         count_used = 0
         count_vacancy = 0
         for page in count(0, 1):
@@ -47,14 +47,14 @@ def get_description_of_languages_hh(languages):
             for vacancy in response["items"]:
                 if vacancy["salary"]:
                     if vacancy["salary"]["currency"] == "RUR":
-                        predict_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
+                        average_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
                         count_used += 1
 
             if page >= response["pages"] - 1:
                 break
 
         count_vacancy = response["found"]
-        predict_salary = sum(predict_salaries) / len(predict_salaries)
+        predict_salary = sum(average_salaries) / len(average_salaries)
 
         languages[language] = {
             "vacancies_found": count_vacancy,
@@ -86,7 +86,7 @@ def get_request_sj(key, language="Python", page=0):
 def get_description_of_languages_sj(key, languages):
     for language in languages:
         count_used = 0
-        predict_salaries = []
+        average_salaries = []
         count_vacancy = 0
         for page in count(0, 1):
             response = get_request_sj(key, language, page=page)
@@ -94,14 +94,14 @@ def get_description_of_languages_sj(key, languages):
             for vacancy in response["objects"]:
                 if vacancy["payment_from"] or vacancy["payment_to"]:
                     if vacancy["currency"] == "rub":
-                        predict_salaries.append(predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]))
+                        average_salaries.append(predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]))
                         count_used += 1
 
             if not response["more"]:
                 break
 
         count_vacancy = response["total"]
-        predict_salary = sum(predict_salaries) / len(predict_salaries)
+        predict_salary = sum(average_salaries) / len(average_salaries)
 
         languages[language] = {
             "vacancies_found": count_vacancy,
