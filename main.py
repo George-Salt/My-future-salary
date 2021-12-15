@@ -45,10 +45,9 @@ def get_description_of_languages_hh(languages):
             response = get_request_hh(language, page=page)
 
             for vacancy in response["items"]:
-                if vacancy["salary"]:
-                    if vacancy["salary"]["currency"] == "RUR":
-                        average_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
-                        count_used += 1
+                if vacancy["salary"] and vacancy["salary"]["currency"] == "RUR":
+                    average_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
+                    count_used += 1
 
             if page >= response["pages"] - 1:
                 break
