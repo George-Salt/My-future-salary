@@ -23,12 +23,12 @@ def predict_rub_salary(salary_from=None, salary_to=None):
     return expected_salary
 
 
-def get_vacancies_hh(language="Python", page=0):
+def get_vacancies_hh(specialty, period, moscow_id, language="Python", page=0):
     url = "https://api.hh.ru/vacancies/"
     params = {
-        "specialization": PROGRAMMER_SPECIALIZATION,
-        "area": MOSCOW_ID,
-        "period": DAYS_IN_PERIOD,
+        "specialization": specialty,
+        "area": moscow_id,
+        "period": period,
         "text": language,
         "page": page
     }
@@ -38,15 +38,24 @@ def get_vacancies_hh(language="Python", page=0):
     return response.json()
 
 
-def get_statistics_of_one_language_hh(language):
+def get_statistics_of_one_language_hh(specialty, period, moscow_id, language):
     average_salaries = []
     count_used = 0
     for page in count(0, 1):
-        response = get_vacancies_hh(language, page=page)
+        response = get_vacancies_hh(
+            specialty,
+            period,
+            moscow_id,
+            language,
+            page=page
+        )
 
         for vacancy in response["items"]:
             if vacancy["salary"] and vacancy["salary"]["currency"] == "RUR":
-                average_salaries.append(predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]))
+                average_salaries.append(predict_rub_salary(
+                    vacancy["salary"]["from"],
+                    vacancy["salary"]["to"]
+                ))
                 count_used += 1
 
         if page >= response["pages"] - 1:
@@ -63,13 +72,18 @@ def get_statistics_of_one_language_hh(language):
     return vacancies_for_language
 
 
-def get_statistics_of_languages_hh(languages):
+def get_statistics_of_languages_hh(specialty, period, moscow_id, languages):
     for language in languages:
-        languages[language] = get_statistics_of_one_language_hh(language)
+        languages[language] = get_statistics_of_one_language_hh(
+            specialty,
+            period,
+            moscow_id,
+            language
+        )
     return languages
 
 
-def get_vacancies_sj(key, language="Python", page=0):
+def get_vacancies_sj(period, catalogue, key, language="Python", page=0):
     url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
         "X-Api-App-Id": key
@@ -77,8 +91,8 @@ def get_vacancies_sj(key, language="Python", page=0):
 
     params = {
         "town": "Moscow",
-        "period": DAYS_IN_PERIOD,
-        "catalogues": PROGRAMMING_CATALOGUE,
+        "period": period,
+        "catalogues": catalogue,
         "keyword": language,
         "page": page
     }
@@ -88,16 +102,25 @@ def get_vacancies_sj(key, language="Python", page=0):
     return response.json()
 
 
-def get_statistics_of_one_language_sj(key, language):
+def get_statistics_of_one_language_sj(period, catalogue, key, language):
     count_used = 0
     average_salaries = []
     for page in count(0, 1):
-        response = get_vacancies_sj(key, language, page=page)
+        response = get_vacancies_sj(
+            period,
+            catalogue,
+            key,
+            language,
+            page=page
+        )
 
         for vacancy in response["objects"]:
             if vacancy["payment_from"] or vacancy["payment_to"]:
                 if vacancy["currency"] == "rub":
-                    average_salaries.append(predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]))
+                    average_salaries.append(predict_rub_salary(
+                        vacancy["payment_from"],
+                        vacancy["payment_to"]
+                    ))
                     count_used += 1
 
         if not response["more"]:
@@ -114,18 +137,33 @@ def get_statistics_of_one_language_sj(key, language):
     return vacancies_for_language
 
 
-def get_statistics_of_languages_sj(key, languages):
+def get_statistics_of_languages_sj(period, catalogue, key, languages):
     for language in languages:
-        languages[language] = get_statistics_of_one_language_sj(key, language)
+        languages[language] = get_statistics_of_one_language_sj(
+            period,
+            catalogue,
+            key,
+            language
+        )
     return languages
 
 
 def create_table(title, statistics):
     table_data = [
-        ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"]
+        [
+            "Язык программирования",
+            "Вакансий найдено",
+            "Вакансий обработано",
+            "Средняя зарплата"
+        ]
     ]
     for language, vacancies in statistics.items():
-        table_data.append([language, vacancies["vacancies_found"], vacancies["vacancies_processed"], vacancies["average_salary"]])
+        table_data.append([
+            language,
+            vacancies["vacancies_found"],
+            vacancies["vacancies_processed"],
+            vacancies["average_salary"]
+        ])
     table = AsciiTable(table_data, title)
     return table.table
 
@@ -145,6 +183,22 @@ if __name__ == "__main__":
     }
     load_dotenv()
     superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
-    hh_table = create_table(HH_TITLE, get_statistics_of_languages_hh(programming_languages))
-    sj_table = create_table(SJ_TITLE, get_statistics_of_languages_sj(superjob_key, programming_languages))
+    hh_table = create_table(
+        HH_TITLE,
+        get_statistics_of_languages_hh(
+            PROGRAMMER_SPECIALIZATION,
+            DAYS_IN_PERIOD,
+            MOSCOW_ID,
+            programming_languages
+        )
+    )
+    sj_table = create_table(
+        SJ_TITLE,
+        get_statistics_of_languages_sj(
+            DAYS_IN_PERIOD,
+            PROGRAMMING_CATALOGUE,
+            superjob_key,
+            programming_languages
+        )
+    )
     print(f"{sj_table}\n{hh_table}")
