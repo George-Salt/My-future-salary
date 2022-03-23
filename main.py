@@ -1,3 +1,4 @@
+from collections import defaultdict
 from terminaltables import AsciiTable
 import requests
 import os
@@ -73,14 +74,15 @@ def get_statistics_of_one_language_hh(specialty, period, moscow_id, language):
 
 
 def get_statistics_of_languages_hh(specialty, period, moscow_id, languages):
+    statistics = defaultdict()
     for language in languages:
-        languages[language] = get_statistics_of_one_language_hh(
+        statistics[language] = get_statistics_of_one_language_hh(
             specialty,
             period,
             moscow_id,
             language
         )
-    return languages
+    return statistics
 
 
 def get_vacancies_sj(period, catalogue, key, language="Python", page=0):
@@ -115,7 +117,7 @@ def get_statistics_of_one_language_sj(period, catalogue, key, language):
         )
 
         for vacancy in response["objects"]:
-            if vacancy["payment_from"] or vacancy["payment_to"]:
+            if vacancy["payment_from"] or vacancy["payment_to"] != 0 or None:
                 if vacancy["currency"] == "rub":
                     average_salaries.append(predict_rub_salary(
                         vacancy["payment_from"],
@@ -138,14 +140,15 @@ def get_statistics_of_one_language_sj(period, catalogue, key, language):
 
 
 def get_statistics_of_languages_sj(period, catalogue, key, languages):
+    statistics = defaultdict()
     for language in languages:
-        languages[language] = get_statistics_of_one_language_sj(
+        statistics[language] = get_statistics_of_one_language_sj(
             period,
             catalogue,
             key,
             language
         )
-    return languages
+    return statistics
 
 
 def create_table(title, statistics):
@@ -169,18 +172,19 @@ def create_table(title, statistics):
 
 
 if __name__ == "__main__":
-    programming_languages = {
-        "Python": 0,
-        "Java": 0,
-        "Javascript": 0,
-        "Ruby": 0,
-        "PHP": 0,
-        "C++": 0,
-        "C#": 0,
-        "C": 0,
-        "Go": 0,
-        "Shell": 0
-    }
+    programming_languages = [
+        "Python",
+        "Java",
+        "Javascript",
+        "Ruby",
+        "PHP",
+        "C++",
+        "C#",
+        "C",
+        "Go",
+        "Shell"
+    ]
+
     load_dotenv()
     superjob_key = os.getenv("SUPERJOB_SECRET_KEY")
     hh_table = create_table(
