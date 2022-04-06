@@ -117,7 +117,7 @@ def get_language_statistics_sj(period, catalogue, key, language):
         )
 
         for vacancy in response["objects"]:
-            if vacancy["payment_from"] or vacancy["payment_to"] != 0 or None:
+            if vacancy["payment_from"] or vacancy["payment_to"]:
                 if vacancy["currency"] == "rub":
                     average_salaries.append(predict_rub_salary(
                         vacancy["payment_from"],
