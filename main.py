@@ -39,7 +39,7 @@ def get_vacancies_hh(specialty, period, moscow_id, language="Python", page=0):
     return response.json()
 
 
-def get_statistics_of_one_language_hh(specialty, period, moscow_id, language):
+def get_language_statistics_hh(specialty, period, moscow_id, language):
     average_salaries = []
     count_used = 0
     for page in count(0, 1):
@@ -76,7 +76,7 @@ def get_statistics_of_one_language_hh(specialty, period, moscow_id, language):
 def get_statistics_of_languages_hh(specialty, period, moscow_id, languages):
     statistics = defaultdict()
     for language in languages:
-        statistics[language] = get_statistics_of_one_language_hh(
+        statistics[language] = get_language_statistics_hh(
             specialty,
             period,
             moscow_id,
@@ -104,7 +104,7 @@ def get_vacancies_sj(period, catalogue, key, language="Python", page=0):
     return response.json()
 
 
-def get_statistics_of_one_language_sj(period, catalogue, key, language):
+def get_language_statistics_sj(period, catalogue, key, language):
     count_used = 0
     average_salaries = []
     for page in count(0, 1):
@@ -142,7 +142,7 @@ def get_statistics_of_one_language_sj(period, catalogue, key, language):
 def get_statistics_of_languages_sj(period, catalogue, key, languages):
     statistics = defaultdict()
     for language in languages:
-        statistics[language] = get_statistics_of_one_language_sj(
+        statistics[language] = get_language_statistics_sj(
             period,
             catalogue,
             key,
