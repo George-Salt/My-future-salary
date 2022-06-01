@@ -52,23 +52,29 @@ def get_language_statistics_hh(specialty, period, moscow_id, language):
         )
 
         for vacancy in response["items"]:
-            if vacancy["salary"] and vacancy["salary"]["currency"] == "RUR":
-                average_salaries.append(predict_rub_salary(
-                    vacancy["salary"]["from"],
-                    vacancy["salary"]["to"]
-                ))
-                count_used += 1
+            if not vacancy["salary"]:
+                continue
+            if not vacancy["salary"]["currency"] == "RUR":
+                continue
+            average_salaries.append(predict_rub_salary(
+                vacancy["salary"]["from"],
+                vacancy["salary"]["to"]
+            ))
+            count_used += 1
 
         if page >= response["pages"] - 1:
             break
 
     vacancy_count = response["found"]
-    average_salary = sum(average_salaries) / len(average_salaries)
+    if len(average_salaries):
+        average_salary = int(sum(average_salaries) / len(average_salaries))
+    else:
+        average_salary = "-"
 
     vacancies_for_language = {
         "vacancies_found": vacancy_count,
         "vacancies_processed": count_used,
-        "average_salary": int(average_salary)
+        "average_salary": average_salary
     }
     return vacancies_for_language
 
@@ -117,24 +123,29 @@ def get_language_statistics_sj(period, catalogue, key, language):
         )
 
         for vacancy in response["objects"]:
-            if vacancy["payment_from"] or vacancy["payment_to"]:
-                if vacancy["currency"] == "rub":
-                    average_salaries.append(predict_rub_salary(
-                        vacancy["payment_from"],
-                        vacancy["payment_to"]
-                    ))
-                    count_used += 1
+            if not vacancy["payment_from"] or vacancy["payment_to"]:
+                continue
+            if not vacancy["currency"] == "rub":
+                continue
+            average_salaries.append(predict_rub_salary(
+                vacancy["payment_from"],
+                vacancy["payment_to"]
+            ))
+            count_used += 1
 
         if not response["more"]:
             break
 
     vacancy_count = response["total"]
-    average_salary = sum(average_salaries) / len(average_salaries)
+    if len(average_salaries):
+        average_salary = int(sum(average_salaries) / len(average_salaries))
+    else:
+        average_salary = "-"
 
     vacancies_for_language = {
         "vacancies_found": vacancy_count,
         "vacancies_processed": count_used,
-        "average_salary": int(average_salary)
+        "average_salary": average_salary
     }
     return vacancies_for_language
 
@@ -180,7 +191,7 @@ if __name__ == "__main__":
         "PHP",
         "C++",
         "C#",
-        "C",
+        "Cobol",
         "Go",
         "Shell"
     ]
